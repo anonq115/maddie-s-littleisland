@@ -1,0 +1,33 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "myproject",
+  "outputfilename": "myproject",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "",
+    "email": ""
+  },
+  "frontend": {
+    "dir": "./frontend",
+    "assets": "./frontend/dist"
+  },
+  "window": {
+    "title": "Maddie's Island",
+    "width": 800,
+    "height": 33,
+    "resizable": false,
+    "alwaysOnTop": true,
+    "frameless": true,
+    "transparent": true
+  },
+  "windows": {
+    "webviewIsTransparent": true,
+    "windowIsTranslucent": true,
+    "DisableFramelessWindowDecorations": true
+    
+    
+  }
+}

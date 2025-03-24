@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Correct path if using different directory structure -->
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maddie's Little Island</title>
+    <style> html{ }
+        /* ======== VARIABLES ======== */
+        :root {
+         
+            --text-light: #ffffff;
+            --accent-color: #726b6b;
+            --orange-bg: #FF6B35;
+            --transition-speed: 0.4s;
+        }
+
+        /* ======== BASIC LAYOUT ======== */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            overflow: hidden;   margin: 0;
+  background: transparent; background-color: transparent !important; /* Ensure transparent background */
+ 
+        }
+
+        /* ======== ISLAND CONTAINER ======== */
+        .maddies-little-island {
+            perspective: 1000px;
+            position: relative;
+            transform: translateY(0px);
+        }
+
+        .inner-wrapper {
+            background-color: #000000c4;
+            color: var(--text-light);
+            border-radius: 25px;
+            padding: 0;
+            width: 70px;
+            height: 25px;
+            transition: all var(--transition-speed) cubic-bezier(0.36, 0.66, 0.04, 1);
+            box-shadow: none;
+            position: relative;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center;
+            will-change: transform, width, height, border-radius, background-color;
+            z-index: 2;
+        }
+
+        /* Island hover effects */
+        .maddies-little-island:hover .inner-wrapper {
+            width: 300px;
+            height: 45px;
+            padding: 10px 15px;
+        }
+
+        .inner-wrapper:hover {
+            transform: scale(1.05) rotateX(3deg);
+            box-shadow: none;
+        }
+
+        /* ======== APP TITLE ======== */
+        .app-title {
+            width: 100%;
+            position: absolute;
+            top: -25px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: var(--bg-dark);
+            font-weight: bold;
+        }
+
+        .maddies-little-island:hover .app-title {
+            opacity: 1;
+        }
+
+        /* ======== DEFAULT ICON ======== */
+        .default-profile {
+            position: absolute;
+            width: 32px;
+            height: 35px;
+            transition: opacity 0.3s ease;
+            top: 71%;
+            left: 54%;
+            transform: translate(-50%, -50%);
+        }
+
+        .maddies-little-island:not(:hover) .default-profile {
+            opacity: 1;
+        }
+
+        .maddies-little-island:hover .default-profile {
+            opacity: 0;
+        }
+
+        /* ======== APPS CONTAINER ======== */
+        .apps-container {
+            display: flex;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .maddies-little-island:hover .apps-container {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ======== APP ICONS ======== */
+        .app-icon {
+            width: 19px;
+            height: 22px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .maddies-little-island:hover .apps-container .app-icon {
+            width: 35px;
+            height: 35px;
+        }
+
+        /* Special styling for the Maddie icon */
+        .app-icon[data-app="maddie"] {
+            background-image: url('https://i.imgur.com/2D8gFpZ.png');
+            background-size: cover;
+            background-position: center;
+            background-color: transparent;
+            border-radius: 41% 37% 37% 36%;
+        }
+
+        .app-icon[data-app="maddie"] i {
+            opacity: 0;
+        }
+
+        /* Icon hover effects */
+        .app-icon:hover {
+            transform: scale(1.2);
+            box-shadow: none;
+        }
+
+        .app-icon.active {
+            background-color: var(--orange-bg);
+            transform: scale(1.25);
+        }
+
+        .app-icon i {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        .maddies-little-island:hover .apps-container .app-icon i {
+            font-size: 24px;
+        }
+
+        /* Create a continuous interactive zone to prevent flickering */
+        .interaction-zone {
+            position: absolute;
+            width: 100%;
+            height: 20px; /* Invisible connector between island and component */
+            bottom: -20px;
+            left: 0;
+            z-index: 2;
+            pointer-events: auto; /* Captures mouse events */
+        }
+        
+        /* ======== COMPONENT CONTAINERS ======== */
+        .component-container {
+            display: none;
+            position: absolute;
+            top: 100%; /* Positioned directly at the bottom of the island */
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            min-width: 300px;
+            min-height: 100px;
+            
+            border-radius: 12px;
+            box-shadow: none;
+            z-index: 3;
+            padding: 15px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+        }
+        
+        .component-container.visible {
+            display:block;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0); 
+        }
+    </style>
+</head>
+<body style="margin: 0; background:none; overflow: hidden;">
+    
+    <!-- Main island container -->
+    <section class="maddies-little-island">
+        <div class="inner-wrapper" id="island">
+            <!-- App name display -->
+            <div class="app-title" id="appTitle">Hover to explore</div>
+            
+            <!-- Default icon (shown when not hovering) -->
+            <div class="default-profile">
+                <div class="app-icon" data-app="maddie">
+                    <i class="icon-maddie">M</i>
+                </div>
+            </div>
+            
+            <!-- App icons container (shown on hover) -->
+            <div class="apps-container" id="appsContainer">
+                <div class="app-icon" data-app="maddie">
+                    <i class="icon-maddie">M</i>
+                    <!-- Insert custom element component insertion here -->
+                </div>
+                <div class="app-icon" data-app="calendar">
+                    <i class="icon-calendar">📅</i>
+                    <!-- Insert custom element component insertion here -->
+                </div>
+              
+            </div>
+            
+            <!-- Invisible zone to prevent flickering when moving to components -->
+            <div class="interaction-zone" id="interactionZone"></div>
+        </div>
+        
+        <!-- Component containers - populated by external web components -->
+        <div id="maddieComponent" class="component-container" data-for="maddie">
+            <!-- Add your custom element here, for example: -->
+            <!-- <maddie-app></maddie-app> -->
+        </div>
+        
+        <div id="calendarComponent" class="component-container" data-for="calendar">
+            <event-calendar></event-calendar>
+        </div>
+        
+    
+    </section>
+    <!-- Load MAIN SYSTEM FIRST -->
+    <script type="module" src="/src/main.js"   type="module"></script>
+    <script type="module" src="/src/calendar-component.js"   type="module"></script>
+    <!-- Then load components -->
+ <script>
+   
+        /**
+         * Maddie's Little Island - Main JavaScript
+         * 
+         * This script handles the interactive behavior of Maddie's Little Island,
+         * including hover effects and component loading.
+         */
+        
+        // DOM Elements
+        const island = document.getElementById('island');
+        const appsContainer = document.getElementById('appsContainer');
+        const appTitle = document.getElementById('appTitle');
+        const componentContainers = document.querySelectorAll('.component-container');
+        const interactionZone = document.getElementById('interactionZone');
+        
+        // App descriptions shown when hovering
+        const appDescriptions = {
+            'maddie': 'Maddie\'s Little Apps',
+            'calendar': `Calendar: ${new Date().toLocaleDateString()}`,
+            'music': 'Music Player',
+            'camera': 'Camera',
+            'settings': 'Settings'
+        };
+
+        // State variables
+        let currentApp = null;
+        let hideTimeout = null;
+        let isOverComponent = false;
+        
+        /**
+         * Shows the component for the given app
+         * @param {string} appName - The name of the app to show
+         */
+        function showComponent(appName) {
+            console.log(`Showing ${appName} component`);
+            
+            // Get the component container for this app
+            const componentContainer = document.querySelector(`.component-container[data-for="${appName}"]`);
+            
+            if (componentContainer) {
+                hideAllComponents();
+                componentContainer.classList.add('visible');
+                isOverComponent = true;
+                
+                // Make interaction zone visible to the mouse events
+                // but keep it invisible to the eye
+                interactionZone.style.pointerEvents = 'auto';
+            }
+        }
+        
+        /**
+         * Hides all component containers
+         */
+        function hideAllComponents() {
+            componentContainers.forEach(container => {
+                container.classList.remove('visible');
+            });
+        }
+
+        /**
+         * Resets the interface to the default state
+         */
+        function resetInterface() {
+            appsContainer.querySelectorAll('.app-icon').forEach(icon => {
+                icon.classList.remove('active');
+            });
+            hideAllComponents();
+            appTitle.textContent = 'Hover to explore';
+            currentApp = null;
+            isOverComponent = false;
+            
+            // Disable the interaction zone
+            interactionZone.style.pointerEvents = 'none';
+        }
+
+        /**
+         * Handles hovering over an app icon
+         * @param {HTMLElement} icon - The icon being hovered
+         */
+        function handleIconHover(icon) {
+            clearTimeout(hideTimeout);
+            const app = icon.dataset.app;
+            
+            if (currentApp === app) return;
+            
+            // Update UI to show this is the active app
+            currentApp = app;
+            appsContainer.querySelectorAll('.app-icon').forEach(i => i.classList.remove('active'));
+            icon.classList.add('active');
+            
+            // Update the app title
+            appTitle.textContent = appDescriptions[app];
+            
+            // Show the component
+            showComponent(app);
+        }
+
+        // ======== EVENT LISTENERS ========
+        
+        // Add event listeners to app icons
+        document.querySelectorAll('.apps-container .app-icon').forEach(icon => {
+            // On hover, show the related component
+            icon.addEventListener('mouseenter', () => handleIconHover(icon));
+            
+            // When mouse leaves an icon, prepare to reset if not hovering over a component
+            icon.addEventListener('mouseleave', () => {
+                hideTimeout = setTimeout(() => {
+                    if (!isOverComponent) resetInterface();
+                }, 200);
+            });
+        });
+
+        // Handle mouse leaving the island - improved detection for seamless transition
+        island.addEventListener('mouseleave', (event) => {
+            // Check if we're moving toward a component container
+            const componentsRect = document.querySelector('.component-container.visible')?.getBoundingClientRect();
+            if (componentsRect) {
+                // Use a very generous check for moving toward the component 
+                const islandRect = island.getBoundingClientRect();
+                const isMovingDownward = event.clientY >= islandRect.top && event.clientY <= islandRect.bottom + 50;
+                const isWithinWidth = event.clientX >= componentsRect.left - 50 && event.clientX <= componentsRect.right + 50;
+                
+                if (isMovingDownward && isWithinWidth) {
+                    // Don't hide if potentially moving toward component
+                    return;
+                }
+            }
+            
+            // Otherwise reset
+            resetInterface();
+        });
+        
+        // Add event listeners for components and interaction zone
+        componentContainers.forEach(container => {
+            // When hovering over a component, keep it visible
+            container.addEventListener('mouseenter', () => {
+                clearTimeout(hideTimeout);
+                isOverComponent = true;
+            });
+            
+            // When mouse leaves a component, hide it
+            container.addEventListener('mouseleave', () => {
+                isOverComponent = false;
+                resetInterface();
+            });
+        });
+        
+        // Add event listener to the interaction zone
+        interactionZone.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            // Keep current component visible
+            if (currentApp) {
+                const componentContainer = document.querySelector(`.component-container[data-for="${currentApp}"]`);
+                if (componentContainer) {
+                    componentContainer.classList.add('visible');
+                }
+            }
+        });
+        
+        /**
+         * COMPONENT REGISTRATION SYSTEM
+         * 
+         * This section handles loading and registering external web components.
+         * Other developers can add their components without modifying this file.
+         */
+        
+        // Initialize the system
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initially disable the interaction zone
+            interactionZone.style.pointerEvents = 'none';
+            
+            // Auto-detect and load all component files
+            const componentsToLoad = ['maddie', 'calendar', 'music', 'camera', 'settings'];
+            
+            componentsToLoad.forEach(appName => {
+                // This creates a script tag to load the external component file
+                const script = document.createElement('script');
+                script.src = `./${appName}-component.js`;
+                script.type = 'text/javascript';
+                script.onload = () => {
+                    console.log(`Loaded ${appName} component`);
+                };
+                document.head.appendChild(script);
+            });
+        });
+        
+        /**
+         * Registers a component with the system
+         * This function is called by external component files
+         * 
+         * @param {string} appName - The app name (must match one of the data-app values)
+         * @param {string} componentTag - The custom element tag name
+         */
+        window.registerComponent = function(appName, componentTag) {
+            const container = document.getElementById(`${appName}Component`);
+            if (container) {
+                // Skip if the container already has children (manually added in HTML)
+                if (container.children.length > 0) {
+                    console.log(`Component for ${appName} already exists, skipping registration`);
+                    return;
+                }
+                
+                // Create the custom element inside the container
+                const element = document.createElement(componentTag);
+                container.appendChild(element);
+                console.log(`Registered component: ${componentTag} for ${appName}`);
+            } else {
+                console.warn(`Container for ${appName} not found`);
+            }
+        }; 
+    </script>
+
+  
+  
+</body>  
+</html>

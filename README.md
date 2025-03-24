@@ -1,5 +1,5 @@
 # Maddie's Little Island
-
+--this is using wails btw.
 ## versions
 - Go v22.13.1 
 - Wails v2.10
